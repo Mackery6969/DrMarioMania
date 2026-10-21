@@ -33,7 +33,7 @@ jobs:
             artifact: DrMarioMania-Linux
           - platform: macOS
             os: macos-latest
-            preset: MacOS
+            preset: macOS
             output: build/macOS/DrMarioMania.zip
             artifact: DrMarioMania-macOS
           - platform: Android
