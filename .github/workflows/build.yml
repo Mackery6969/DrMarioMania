@@ -23,24 +23,33 @@ jobs:
         include:
           - platform: Windows
             os: windows-latest
-            preset: DrMarioMania
+            preset: Windows
             output: build/Windows/DrMarioMania.exe
             artifact: DrMarioMania-Windows
+
           - platform: Linux
             os: ubuntu-latest
-            preset: DrMarioMania
+            preset: Linux
             output: build/Linux/DrMarioMania.x86_64
             artifact: DrMarioMania-Linux
+
+          - platform: Android
+            os: ubuntu-latest
+            preset: Android
+            output: build/Android/DrMarioMania.apk
+            artifact: DrMarioMania-Android
+
           - platform: macOS
             os: macos-latest
             preset: macOS
             output: build/macOS/DrMarioMania.zip
             artifact: DrMarioMania-macOS
-          - platform: Android
-            os: ubuntu-latest
-            preset: DrMarioMania
-            output: build/Android/DrMarioMania.apk
-            artifact: DrMarioMania-Android
+
+          - platform: iOS
+            os: macos-latest
+            preset: iOS
+            output: build/iOS/DrMarioMania.zip
+            artifact: DrMarioMania-iOS
 
     steps:
       - name: Checkout
