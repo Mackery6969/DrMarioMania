@@ -18,12 +18,7 @@ public partial class EditorBaseTileSelector : EditorBaseInputSelector
     {
         set
         {
-            foreach (Sprite2D sprite in buttonSprites)
-            {
-                if (sprite.Texture == pillTexture)
-                    sprite.Texture = value;
-            }
-
+            ReplaceButtonTexture(pillTexture, value);
             pillTexture = value;
         }
     }
@@ -31,12 +26,7 @@ public partial class EditorBaseTileSelector : EditorBaseInputSelector
     {
         set
         {
-            foreach (Sprite2D sprite in buttonSprites)
-            {
-                if (sprite.Texture == virusTexture)
-                    sprite.Texture = value;
-            }
-
+            ReplaceButtonTexture(virusTexture, value);
             virusTexture = value;
         }
     }
@@ -44,12 +34,7 @@ public partial class EditorBaseTileSelector : EditorBaseInputSelector
     {
         set
         {
-            foreach (Sprite2D sprite in buttonSprites)
-            {
-                if (sprite.Texture == powerUpTexture)
-                    sprite.Texture = value;
-            }
-
+            ReplaceButtonTexture(powerUpTexture, value);
             powerUpTexture = value;
         }
     }
@@ -57,13 +42,17 @@ public partial class EditorBaseTileSelector : EditorBaseInputSelector
     {
         set
         {
-            foreach (Sprite2D sprite in buttonSprites)
-            {
-                if (sprite.Texture == objectTexture)
-                    sprite.Texture = value;
-            }
-
+            ReplaceButtonTexture(objectTexture, value);
             objectTexture = value;
+        }
+    }
+
+    private void ReplaceButtonTexture(Texture2D oldTexture, Texture2D newTexture)
+    {
+        foreach (Sprite2D sprite in buttonSprites)
+        {
+            if (sprite.Texture == oldTexture)
+                sprite.Texture = newTexture;
         }
     }
 
