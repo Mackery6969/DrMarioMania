@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   export:
     name: Export ${{ matrix.platform }}
@@ -57,10 +61,11 @@ jobs:
       - name: Verify Godot
         run: godot --headless --version
 
-      - name: Restore and build C#
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
+      - name: Restore C# project
+        run: dotnet restore DrMario.csproj
+
+      - name: Build C# project
+        run: dotnet build DrMario.csproj --configuration Release --no-restore
 
       - name: Import resources
         run: godot --headless --editor --path . --import
