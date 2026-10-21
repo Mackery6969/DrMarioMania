@@ -24,8 +24,8 @@ public partial class EditorColourSelector : EditorBaseTileSelector
             Visible = false;
             return;
         }
-        else
-            Visible = true;
+
+        Visible = true;
 
         for (int i = 0; i < buttons.Count; i++)
         {
