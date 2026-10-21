@@ -2,16 +2,8 @@ name: Build
 
 on:
   push:
-    paths: &project-paths
-      - "**"
-      - "!**.md"
-      - "!LICENSE*"
-      - "!.gitignore"
-      - "!.gitattributes"
-      - "!.github/**"
-      - ".github/workflows/build.yml"
+    branches: [main]
   pull_request:
-    paths: *project-paths
   workflow_dispatch:
 
 permissions:
@@ -22,8 +14,38 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      project: ${{ steps.filter.outputs.changes != '[]' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Filter paths
+        id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          predicate-quantifier: some-with-excludes
+          filters: |
+            project:
+              - "**"
+              - "!**/*.md"
+              - "!LICENSE*"
+              - "!.gitignore"
+              - "!.gitattributes"
+              - "!.github/**"
+            workflow:
+              - .github/workflows/build.yml
+
   export:
     name: Export ${{ matrix.platform }}
+    needs: changes
+    if: needs.changes.outputs.project == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -57,7 +79,6 @@ jobs:
 
     defaults:
       run:
-        # Godot's Windows executable is a GUI app, so PowerShell doesn't wait for it to exit.
         shell: bash
 
     steps:
@@ -95,7 +116,6 @@ jobs:
       - name: Restore C# project
         run: dotnet restore DrMario.csproj
 
-      # The editor loads the Debug assembly; the export step does its own Release publish.
       - name: Build C# project
         run: dotnet build DrMario.csproj --no-restore
 
@@ -129,7 +149,6 @@ jobs:
             echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=$password"
           } >> "$GITHUB_ENV"
 
-      # Building a signed .ipa needs certificates and provisioning profiles, so CI only exports the Xcode project.
       - name: Configure iOS export
         if: matrix.platform == 'iOS'
         env:
@@ -155,3 +174,18 @@ jobs:
           name: DrMarioMania-${{ matrix.platform }}
           path: build/${{ matrix.platform }}/
           if-no-files-found: error
+
+  build:
+    name: Build
+    needs: [changes, export]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check export results
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Job results: $RESULTS"
+          case " $RESULTS " in
+            *" failure "* | *" cancelled "*) exit 1 ;;
+          esac
