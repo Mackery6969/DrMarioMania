@@ -2,7 +2,16 @@ name: Build
 
 on:
   push:
+    paths: &project-paths
+      - "**"
+      - "!**.md"
+      - "!LICENSE*"
+      - "!.gitignore"
+      - "!.gitattributes"
+      - "!.github/**"
+      - ".github/workflows/build.yml"
   pull_request:
+    paths: *project-paths
   workflow_dispatch:
 
 permissions:
