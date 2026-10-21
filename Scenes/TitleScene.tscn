@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://ceub54vom5fq0"]
+[gd_scene format=3 uid="uid://ceub54vom5fq0"]
 
 [ext_resource type="AudioStream" uid="uid://c8v3338gs6cbo" path="res://Assets/Audio/Sounds/NES/Land.ogg" id="1_dofet"]
 [ext_resource type="Texture2D" uid="uid://cabal1d13sm0y" path="res://Assets/Sprites/UI/Logo/LogoPill.png" id="1_uec1p"]
@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://ciycvm6fh6cel" path="res://Assets/Prefabs/PopUpGroup.tscn" id="8_n6d3v"]
 [ext_resource type="PackedScene" uid="uid://blrcky0050ep3" path="res://Assets/Prefabs/ScreenTransition.tscn" id="10_3e8r8"]
 [ext_resource type="AudioStream" uid="uid://don7ccvg8w41o" path="res://Assets/Audio/Music/World/MultiLobby.mp3" id="10_ek7j1"]
-[ext_resource type="Script" path="res://Scripts/TitleManager.cs" id="10_si3tg"]
+[ext_resource type="Script" uid="uid://bcfgyptqre5v8" path="res://Scripts/TitleManager.cs" id="10_si3tg"]
 [ext_resource type="Resource" uid="uid://cwkwokd34qh80" path="res://Assets/Resources/CommonGameSettings.tres" id="12_hfm7h"]
 [ext_resource type="Resource" uid="uid://31tismb2r7a" path="res://Assets/Resources/UserCustomLevelList.tres" id="13_avuk5"]
 [ext_resource type="Resource" uid="uid://62i3k0vvpg7q" path="res://Assets/Resources/HighScoreList.tres" id="14_lkan4"]
@@ -285,8 +285,8 @@ tracks/6/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_6isiw"]
 _data = {
-"FallIn": SubResource("Animation_bk65j"),
-"RESET": SubResource("Animation_3l542")
+&"FallIn": SubResource("Animation_bk65j"),
+&"RESET": SubResource("Animation_3l542")
 }
 
 [sub_resource type="Animation" id="Animation_0qk8i"]
@@ -402,17 +402,17 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_5fnvw"]
 _data = {
-"FadeIn": SubResource("Animation_0qk8i"),
-"Hover": SubResource("Animation_oqj7n"),
-"RESET": SubResource("Animation_58pxa")
+&"FadeIn": SubResource("Animation_0qk8i"),
+&"Hover": SubResource("Animation_oqj7n"),
+&"RESET": SubResource("Animation_58pxa")
 }
 
-[node name="TitleScene" type="Node2D"]
+[node name="TitleScene" type="Node2D" unique_id=1637746516]
 modulate = Color(1, 1, 1, 0)
 
-[node name="UILayer" type="CanvasLayer" parent="."]
+[node name="UILayer" type="CanvasLayer" parent="." unique_id=111950925]
 
-[node name="LogoContainer" type="Control" parent="UILayer"]
+[node name="LogoContainer" type="Control" parent="UILayer" unique_id=320947514]
 layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
@@ -426,28 +426,28 @@ offset_bottom = 36.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ThudSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer"]
+[node name="ThudSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer" unique_id=2008208595]
 stream = ExtResource("1_w0lrv")
 volume_db = -3.0
 bus = &"SFX"
 
-[node name="LandSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer"]
+[node name="LandSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer" unique_id=130051334]
 stream = ExtResource("1_dofet")
 volume_db = -8.0
 bus = &"SFX"
 
-[node name="FallSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer"]
+[node name="FallSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer" unique_id=826651005]
 stream = ExtResource("2_q4w2c")
 volume_db = -3.0
 pitch_scale = 0.5
 bus = &"SFX"
 
-[node name="ShineSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer"]
+[node name="ShineSFX" type="AudioStreamPlayer" parent="UILayer/LogoContainer" unique_id=754111546]
 stream = ExtResource("4_18ylh")
 volume_db = -4.0
 bus = &"SFX"
 
-[node name="LogoPill" type="TextureRect" parent="UILayer/LogoContainer"]
+[node name="LogoPill" type="TextureRect" parent="UILayer/LogoContainer" unique_id=1372147472]
 layout_mode = 1
 offset_left = 14.0
 offset_top = 32.0
@@ -455,7 +455,7 @@ offset_right = 242.0
 offset_bottom = 118.0
 texture = ExtResource("1_uec1p")
 
-[node name="DrMarioTextShadow" type="TextureRect" parent="UILayer/LogoContainer/LogoPill"]
+[node name="DrMarioTextShadow" type="TextureRect" parent="UILayer/LogoContainer/LogoPill" unique_id=1547414560]
 layout_mode = 0
 offset_left = 25.0
 offset_top = 24.0
@@ -463,7 +463,7 @@ offset_right = 206.0
 offset_bottom = 61.0
 texture = ExtResource("2_jcv2n")
 
-[node name="ManiaTextShadow" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow"]
+[node name="ManiaTextShadow" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow" unique_id=267547626]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 0
 offset_left = 35.0
@@ -472,14 +472,14 @@ offset_right = 169.0
 offset_bottom = 48.0
 texture = ExtResource("3_b2om6")
 
-[node name="ManiaText" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow/ManiaTextShadow"]
+[node name="ManiaText" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow/ManiaTextShadow" unique_id=156140597]
 clip_children = 2
 layout_mode = 0
 offset_right = 134.0
 offset_bottom = 26.0
 texture = ExtResource("4_b5g64")
 
-[node name="TextShine" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow/ManiaTextShadow/ManiaText"]
+[node name="TextShine" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow/ManiaTextShadow/ManiaText" unique_id=483252136]
 modulate = Color(1, 1, 1, 0.439216)
 layout_mode = 0
 offset_left = -12.0
@@ -488,18 +488,16 @@ offset_right = 124.0
 offset_bottom = -16.0
 texture = ExtResource("5_iny71")
 
-[node name="DrMarioText" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow"]
+[node name="DrMarioText" type="TextureRect" parent="UILayer/LogoContainer/LogoPill/DrMarioTextShadow" unique_id=1338496588]
 layout_mode = 0
 offset_right = 181.0
 offset_bottom = 37.0
 texture = ExtResource("2_pmocp")
 
-[node name="LogoAniPlayer" type="AnimationPlayer" parent="UILayer/LogoContainer/LogoPill"]
-libraries = {
-"": SubResource("AnimationLibrary_6isiw")
-}
+[node name="LogoAniPlayer" type="AnimationPlayer" parent="UILayer/LogoContainer/LogoPill" unique_id=1386893387]
+libraries/ = SubResource("AnimationLibrary_6isiw")
 
-[node name="StartContainer" type="Control" parent="UILayer"]
+[node name="StartContainer" type="Control" parent="UILayer" unique_id=2039952526]
 modulate = Color(1, 1, 1, 0)
 layout_mode = 3
 anchors_preset = 15
@@ -508,7 +506,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VersionLabel" type="Label" parent="UILayer/StartContainer"]
+[node name="VersionLabel" type="Label" parent="UILayer/StartContainer" unique_id=740760501]
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -529,7 +527,7 @@ theme_override_fonts/font = ExtResource("2_vm2fe")
 theme_override_font_sizes/font_size = 8
 text = "v?.?.?"
 
-[node name="StartLabelContainer" type="Control" parent="UILayer/StartContainer"]
+[node name="StartLabelContainer" type="Control" parent="UILayer/StartContainer" unique_id=897039135]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -543,7 +541,7 @@ offset_bottom = 51.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="StartLabel" type="Label" parent="UILayer/StartContainer/StartLabelContainer"]
+[node name="StartLabel" type="Label" parent="UILayer/StartContainer/StartLabelContainer" unique_id=1880539497]
 layout_mode = 1
 offset_right = 112.0
 offset_bottom = 10.0
@@ -559,18 +557,16 @@ theme_override_font_sizes/font_size = 8
 text = "PRESS ANY KEY!"
 horizontal_alignment = 1
 
-[node name="StartAniPlayer" type="AnimationPlayer" parent="UILayer/StartContainer"]
+[node name="StartAniPlayer" type="AnimationPlayer" parent="UILayer/StartContainer" unique_id=1953293727]
 root_node = NodePath("../StartLabelContainer/StartLabel")
-libraries = {
-"": SubResource("AnimationLibrary_5fnvw")
-}
+libraries/ = SubResource("AnimationLibrary_5fnvw")
 
-[node name="PopUpGroup" parent="UILayer" instance=ExtResource("8_n6d3v")]
+[node name="PopUpGroup" parent="UILayer" unique_id=398452981 instance=ExtResource("8_n6d3v")]
 
-[node name="BackgroundLayer" type="CanvasLayer" parent="."]
+[node name="BackgroundLayer" type="CanvasLayer" parent="." unique_id=1108165932]
 layer = 0
 
-[node name="BackgroundTex" type="TextureRect" parent="BackgroundLayer"]
+[node name="BackgroundTex" type="TextureRect" parent="BackgroundLayer" unique_id=114685196]
 material = ExtResource("2_lgagd")
 anchors_preset = 15
 anchor_right = 1.0
@@ -581,7 +577,7 @@ texture = ExtResource("3_2p18k")
 stretch_mode = 1
 metadata/_edit_lock_ = true
 
-[node name="BackgroundDarken" type="TextureRect" parent="BackgroundLayer"]
+[node name="BackgroundDarken" type="TextureRect" parent="BackgroundLayer" unique_id=1351647776]
 self_modulate = Color(0, 0, 0, 0.498039)
 anchors_preset = 15
 anchor_right = 1.0
@@ -592,14 +588,14 @@ texture = ExtResource("3_2p18k")
 stretch_mode = 1
 metadata/_edit_lock_ = true
 
-[node name="TransitionLayer" type="CanvasLayer" parent="."]
+[node name="TransitionLayer" type="CanvasLayer" parent="." unique_id=276112239]
 layer = 2
 
-[node name="ScreenTransition" parent="TransitionLayer" node_paths=PackedStringArray("musicPlayer") instance=ExtResource("10_3e8r8")]
+[node name="ScreenTransition" parent="TransitionLayer" unique_id=1247513427 node_paths=PackedStringArray("musicPlayer") instance=ExtResource("10_3e8r8")]
 musicPlayer = NodePath("../../MusicPlayer")
 uncoverStyle = 0
 
-[node name="TitleManager" type="Node" parent="." node_paths=PackedStringArray("logoAniPlayer", "versionLabel", "startLabel", "screenTransition", "popUpGroup")]
+[node name="TitleManager" type="Node" parent="." unique_id=909890083 node_paths=PackedStringArray("logoAniPlayer", "versionLabel", "startLabel", "screenTransition", "popUpGroup")]
 script = ExtResource("10_si3tg")
 mobileStartText = "TAP TO START!"
 disclaimerTitleText = "DISCLAIMER"
@@ -617,7 +613,7 @@ commonGameSettings = ExtResource("12_hfm7h")
 userCustomLevelList = ExtResource("13_avuk5")
 highScoreList = ExtResource("14_lkan4")
 
-[node name="MusicPlayer" type="AudioStreamPlayer" parent="."]
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=2081963286]
 stream = ExtResource("10_ek7j1")
 volume_db = -4.0
 bus = &"Music"
