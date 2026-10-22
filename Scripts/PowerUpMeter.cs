@@ -114,19 +114,19 @@ public partial class PowerUpMeter : Control
             useSpecialPowerUp = false;
         // if both normal AND special power-ups exist, do random chance of special
         else
-            useSpecialPowerUp = GD.RandRange(1, specialChance) == 1;
+            useSpecialPowerUp = jarMan.PowerUpRng.RandiRange(1, specialChance) == 1;
 
         // Randomise next special power up, colour always zero (rainbow)
         if (useSpecialPowerUp)
         {
-            nextPowerUp = availableSpecialPowerUps[GD.RandRange(0, availableSpecialPowerUps.Count - 1)];
+            nextPowerUp = availableSpecialPowerUps[jarMan.PowerUpRng.RandiRange(0, availableSpecialPowerUps.Count - 1)];
             nextColour = 0;
         }
         // Randomise next normal power up and colour
         else
         {
-            nextPowerUp = availablePowerUps[GD.RandRange(0, availablePowerUps.Count - 1)];
-            nextColour = jarMan.PossiblePowerUpColours[GD.RandRange(0, jarMan.PossiblePowerUpColours.Count - 1)];
+            nextPowerUp = availablePowerUps[jarMan.PowerUpRng.RandiRange(0, availablePowerUps.Count - 1)];
+            nextColour = jarMan.PossiblePowerUpColours[jarMan.PowerUpRng.RandiRange(0, jarMan.PossiblePowerUpColours.Count - 1)];
         }
 
         UpdateVisuals();

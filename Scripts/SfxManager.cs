@@ -4,6 +4,8 @@ using System;
 public partial class SfxManager : Node
 {
     Godot.Collections.Dictionary<string, AudioStreamPlayer> audioPlayers = new Godot.Collections.Dictionary<string, AudioStreamPlayer>();
+    // A muted manager plays nothing - training gives these to every jar except the one shown big
+    public bool Muted { get; set; } = false;
 
     // Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -29,6 +31,9 @@ public partial class SfxManager : Node
 
     public void Play(string sound)
     {
+        if (Muted)
+            return;
+
         audioPlayers[sound].Play();
     }
 }

@@ -28,7 +28,7 @@ public partial class PowerUpPaint : BaseShootPowerUp
 	{
         // if rainbow, choose random colour that a pill can be
         if (colour == 0)
-            colour = jarMan.PossiblePillColours[GD.RandRange(0, jarMan.PossiblePillColours.Count - 1)];
+            colour = jarMan.PossiblePillColours[jarMan.PowerUpRng.RandiRange(0, jarMan.PossiblePillColours.Count - 1)];
 
         for (int i = 0; i < projectiles.Count; i++)
         {

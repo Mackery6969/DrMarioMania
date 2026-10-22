@@ -40,6 +40,13 @@ public partial class GameManager : Node
     private int remainingPlayers;
     private bool IsInEditorScene { get { return editorMan != null; } }
     private ulong sharedSeed;
+    public ulong SharedSeed { get { return sharedSeed; } }
+    public CommonGameSettings CommonGameSettings { get { return commonGameSettings; } }
+    public GameThemer GameThemer { get { return gameThemer; } }
+    public MusicManager MusicMan { get { return musicMan; } }
+    public SfxManager SfxMan { get { return sfxMan; } }
+    // Training mode for bots (started with the "--train" command line argument) - null when playing normally
+    private TrainingManager trainingMan;
     // Whether or not a player has enough round wins to win the whole game (reached best of # rounds)
     private bool hasPlayerWonEnoughRounds = false;
     // Delay in the game starting after all jars are filled in milliseconds
@@ -59,6 +66,15 @@ public partial class GameManager : Node
 			userCustomLevelList.LoadFromFile();
             highScoreList.LoadFromFile();
 		}
+
+        // training mode creates and runs its own jars
+        if (TrainingManager.IsRequested && !IsInEditorScene)
+        {
+            trainingMan = new TrainingManager();
+            AddChild(trainingMan);
+            trainingMan.Start(this);
+            return;
+        }
 
         if (GetTree().CurrentScene.Name == "EditorScene")
         {
@@ -134,8 +150,7 @@ public partial class GameManager : Node
 
     private void CreateJars()
     {
-        // Generate randomised seed to be given to each jar
-        sharedSeed = GD.Randi();
+        UpdateSharedSeed();
 
         // Make either single-player or multi-player jar group(s) variant depending on player count
         PackedScene jarGroupPrefab = commonGameSettings.PlayerCount == 1 ? jarGroupSinglePrefab : jarGroupMultiPrefab;
@@ -237,6 +252,30 @@ public partial class GameManager : Node
             }
             screenTransition.Cover();
         }
+    }
+
+    // Creates a jar for training mode - uses the multiplayer layout (no Mario or virus ring) so lots of jars fit on screen
+    // The jar's level isn't prepared here, the training manager does that when it gives the jar a game to play
+    public JarManager CreateTrainingJar(PlayerGameSettings settings)
+    {
+        JarGroup group = jarGroupMultiPrefab.Instantiate<JarGroup>();
+
+        JarManager jar = group.JarMan;
+        jars.Add(jar);
+        jar.CommonGameSettings = commonGameSettings;
+        jar.PlayerGameSettings = settings;
+        jar.PlayerMultiInputSettings = commonGameSettings.GetPlayerMultiInputSettings(0);
+        jar.HighScoreList = highScoreList;
+        jar.PlayerID = jars.Count - 1;
+
+        jar.GameMan = this;
+        jar.SfxMan = sfxMan;
+        jar.GameThemer = gameThemer;
+
+        // settings are set before adding to the tree so the jar's _Ready can use them
+        gameLayer.AddChild(group);
+
+        return jar;
     }
 
     public async void IndicateFinishedFillingJar()
@@ -347,10 +386,16 @@ public partial class GameManager : Node
             musicMan.PlayHurryUpJingle();
     }
 
+    // Sets the seed to be given to each jar - the fixed seed if one is set, otherwise a random one
+    private void UpdateSharedSeed()
+    {
+        sharedSeed = commonGameSettings.FixedSeed ?? GD.Randi();
+        GD.Print("Round seed: " + sharedSeed);
+    }
+
     private void PrepareNextRound()
     {
-        // Generate randomised seed to be given to each jar
-        sharedSeed = GD.Randi();
+        UpdateSharedSeed();
 
         isGameOngoing = false;
         jarsLeftToFill = jars.Count;

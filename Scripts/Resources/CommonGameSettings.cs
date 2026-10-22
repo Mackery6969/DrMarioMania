@@ -40,6 +40,10 @@ public partial class CommonGameSettings : Resource
     // 1 = marathon - endless level (new viruses spawn from bottom)
     public int GameMode { get; set; } = 0;
 
+    // Seed used for every round instead of a random one, so the same seed always gives the same viruses, pills and power-ups
+    // null = random seed each round. Can be set at launch with the "--seed=<number>" command line argument
+    public ulong? FixedSeed { get; set; } = ulong.TryParse(CommandLineArgs.Get("seed"), out ulong seed) ? seed : null;
+
     // -1 = new, unsaved level
     // -2 = not a custom level
     public int CustomLevelID { get; set; } = -2;
@@ -222,8 +226,11 @@ public partial class CommonGameSettings : Resource
         bgTintMat.SetShaderParameter("is_active", CurrentIsUsingCustomBgColour);
     }
 
+    // Theme used instead of the chosen one without changing the saved setting (used by training mode) - null = no override
+    public int? ThemeOverride { get; set; } = null;
+
     // auto get the correct theme and music depending on whether in a custom level or not
-    public int CurrentTheme { get { return IsCustomLevel ? CustomLevelTheme : Theme; } }
+    public int CurrentTheme { get { return ThemeOverride ?? (IsCustomLevel ? CustomLevelTheme : Theme); } }
 	public int CurrentMusic { get { return IsCustomLevel ? CustomLevelMusic : Music; } }
 	public string CurrentCustomMusicFile { get { return IsCustomLevel ? CustomLevelCustomMusicFile : CustomMusicFile; } }
     public int MultiplayerRequiredWinCount { get; set; } = 3;

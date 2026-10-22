@@ -152,7 +152,13 @@ public partial class MusicList : Resource
             path = pathPrefix + themeList.GetChillMusicPath(commonGameSettings.CurrentTheme, commonGameSettings.IsMultiplayer);
         // random
         else if (id == GameConstants.randomMusicID){
+            int previousRandomMusic = lastRandomMusic;
             lastRandomMusic = GD.RandRange(1, musicPaths.Count - 1);
+
+            // don't pick the same song twice in a row (if there's more than one to pick from)
+            if (lastRandomMusic == previousRandomMusic && musicPaths.Count > 2)
+                lastRandomMusic = 1 + (lastRandomMusic - 1 + GD.RandRange(1, musicPaths.Count - 2)) % (musicPaths.Count - 1);
+
             path = pathPrefix + musicPaths[lastRandomMusic];
         }
         else

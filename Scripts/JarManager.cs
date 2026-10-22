@@ -157,10 +157,17 @@ public partial class JarManager : Node
     private Dictionary<Vector2I, JarTileData> customLevelTiles;
     public bool IsInEditorScene { get; set; } = false;
     public bool DisablePowerUpSpawning { get; set; } = false;
+    // Set when this jar is played by a training bot - the bot places pills and is told when the game ends instead of GameMan
+    public JarBot Bot { get; set; }
 
-    // Jar-specific random number generator
-    private RandomNumberGenerator localRng = new RandomNumberGenerator();
-    public RandomNumberGenerator LocalRng { get { return localRng; } }
+    // Jar-specific random number generators, all seeded from the round's shared seed
+    // Each has its own stream so that e.g. push-up viruses or power-ups can't change the order of upcoming pills
+    private RandomNumberGenerator pillRng = new RandomNumberGenerator();
+    public RandomNumberGenerator PillRng { get { return pillRng; } }
+    private RandomNumberGenerator virusRng = new RandomNumberGenerator();
+    private RandomNumberGenerator powerUpRng = new RandomNumberGenerator();
+    public RandomNumberGenerator PowerUpRng { get { return powerUpRng; } }
+    private RandomNumberGenerator junkRng = new RandomNumberGenerator();
 
     // Whether or not the player won or not on their last round
     private bool lastWinState = false;
@@ -177,6 +184,7 @@ public partial class JarManager : Node
     private int pushUpCount = 0;
     // push-up countdown, decreases with every throw and resets when a push-up occurs
     private int pushUpCountdown;
+    public int PushUpCountdown { get { return pushUpCountdown; } }
 	// if all viruses are cleared during marathon/endless mode, this score bonus will be added on to the player's score
     private int PushUpClearBonus { get { return 2000 + (PlayerGameSettings.VirusDifficulty * 250); } }
 
@@ -201,6 +209,7 @@ public partial class JarManager : Node
 
 	// no. of rows thst will get pushed up once the push up occurs
     private int pushUpRows = initialPushUpRows;
+    public int PushUpRows { get { return pushUpRows; } }
 	// initial value of above
     private const int initialPushUpRows = 1;
     // max possible value of pushUpRows
@@ -482,7 +491,10 @@ public partial class JarManager : Node
 
 	public bool IsActionJustPressed(string action)
 	{
-		if (CommonGameSettings.PlayerCount > 1)
+		// training bots press their own buttons
+		if (Bot != null)
+			return Bot.IsActionJustPressed(action);
+		else if (CommonGameSettings.PlayerCount > 1)
 		{
 			string newAction = PlayerMultiInputSettings.MultiplayerInputPrefix + action;
 
@@ -497,7 +509,9 @@ public partial class JarManager : Node
 
 	public bool IsActionPressed(string action)
 	{
-		if (CommonGameSettings.PlayerCount > 1)
+		if (Bot != null)
+			return Bot.IsActionPressed(action);
+		else if (CommonGameSettings.PlayerCount > 1)
 		{
 			string newAction = PlayerMultiInputSettings.MultiplayerInputPrefix + action;
 			return InputMap.HasAction(newAction) ? Input.IsActionPressed(newAction) : false;
@@ -573,7 +587,18 @@ public partial class JarManager : Node
 
 		SetProcess(false);
 		pillMan.SetProcess(false);
-		
+
+		// training bots move on to their next game themselves, so skip the overlay and don't end the whole game
+		if (Bot != null)
+		{
+			if (pillMan.IsThrowingPill)
+				pillMan.HideThrowingPills();
+
+			previewTiles.Clear();
+			Bot.OnGameOver();
+			return;
+		}
+
 		if (!IsInEditorScene)
 		{
 			uiMan.ShowGameOverOverlay(CommonGameSettings.PlayerCount > 1);
@@ -700,9 +725,22 @@ public partial class JarManager : Node
 		initialLineComboColours.Clear();
 	}
 
+	// Godot's RNG gives similar streams for similar seeds (e.g. 1 and 2), so each stream's seed is scrambled from the shared seed first
+	private static ulong DeriveSeed(ulong seed, ulong stream)
+	{
+		// splitmix64
+		ulong z = seed + (stream + 1) * 0x9E3779B97F4A7C15;
+		z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9;
+		z = (z ^ (z >> 27)) * 0x94D049BB133111EB;
+		return z ^ (z >> 31);
+	}
+
 	public void PrepareLevel(ulong seed)
 	{
-		localRng.Seed = seed;
+		pillRng.Seed = DeriveSeed(seed, 0);
+		virusRng.Seed = DeriveSeed(seed, 1);
+		powerUpRng.Seed = DeriveSeed(seed, 2);
+		junkRng.Seed = DeriveSeed(seed, 3);
 		DisablePowerUpSpawning = false;
 		PowerUpMeter.SetVisibility(PlayerGameSettings.IsUsingPowerUps);
 		uiMan.SetSpeedLabel(PlayerGameSettings.SpeedLevel);
@@ -968,7 +1006,7 @@ public partial class JarManager : Node
 
 		while (remainingTilePositions.Count > 0)
 		{
-			int index = localRng.RandiRange(0, remainingTilePositions.Count - 1);
+			int index = virusRng.RandiRange(0, remainingTilePositions.Count - 1);
 
 			Vector2I pos = remainingTilePositions[index];
 
@@ -1024,8 +1062,8 @@ public partial class JarManager : Node
 	private void PlaceRandomVirusFromList(List<Vector2I> possibleCells, List<int> virusColours)
 	{
 		// get random position index and virus colour index
-		int posIndex = localRng.RandiRange(0, possibleCells.Count - 1);
-		int virusIndex = localRng.RandiRange(0, virusColours.Count - 1);
+		int posIndex = virusRng.RandiRange(0, possibleCells.Count - 1);
+		int virusIndex = virusRng.RandiRange(0, virusColours.Count - 1);
 
 		// get pos and colour using the above indexes
 		Vector2I pos = possibleCells[posIndex];
@@ -1172,7 +1210,7 @@ public partial class JarManager : Node
 
 		// create list of each virus colour to use
 		// start with a random colour index
-		int firstColourIndex = localRng.RandiRange(0, PlayerGameSettings.ColourCount - 1);
+		int firstColourIndex = virusRng.RandiRange(0, PlayerGameSettings.ColourCount - 1);
 		// add each colour to virus colours list from ChosenColours for each virus, looping back to first colour once reached end of chosen colour list
 		// if isGraduallyAddingColours is true, add colour to jar colours if it hasn't already been added
 		for (int i = 0; i < virusCount; i++)
@@ -1209,11 +1247,15 @@ public partial class JarManager : Node
 			// update virus count label
 			uiMan.SetVirusLabel(virusesRemaining.Count);
 
-			// delay spawning next virus
-			await Task.Delay(1000 / virusGenerationSpeed);
+			// delay spawning next virus (skipped for training bots - this delay is real time, so it can't be sped up)
+			if (Bot == null)
+				await Task.Delay(1000 / virusGenerationSpeed);
         }
 
-		GameMan.IndicateFinishedFillingJar();
+		if (Bot != null)
+			Bot.OnJarFilled();
+		else
+			GameMan.IndicateFinishedFillingJar();
 	}
 
 	public void FillsBottomRowsWithViruses(int rows)
@@ -1230,7 +1272,7 @@ public partial class JarManager : Node
 
 		// fill list of possible positions the viruses could spawn
 		// also create list of each virus colour to use, starting with a random colour index
-		int firstColourIndex = localRng.RandiRange(0, PlayerGameSettings.ColourCount - 1);
+		int firstColourIndex = virusRng.RandiRange(0, PlayerGameSettings.ColourCount - 1);
 
 		for (int i = JarSize.Y - rows; i < JarSize.Y; i++)
 		{
@@ -1974,10 +2016,10 @@ public partial class JarManager : Node
 		else if (lineCombo > 1)
 			SfxMan.Play("ChainX2");
 
-        if (CommonGameSettings.IsMultiplayer && CommonGameSettings.MultiplayerUseJunkPills && lineCombo > 1)
+        if (CommonGameSettings.IsMultiplayer && CommonGameSettings.MultiplayerUseJunkPills && lineCombo > 1 && Bot == null)
 		{
 			// Get random player which isn't this player
-			int receivingPlayer = GD.RandRange(0, CommonGameSettings.PlayerCount - 2);
+			int receivingPlayer = junkRng.RandiRange(0, CommonGameSettings.PlayerCount - 2);
 
 			if (receivingPlayer == PlayerID)
 			{
@@ -2091,7 +2133,7 @@ public partial class JarManager : Node
 		for (int i = 0; i < createCount; i++)
 		{
 			// Get position and remove from segmentsToCreate/queuedJunkSegments
-			int posIndex = GD.RandRange(0, possiblePositions.Count - 1);
+			int posIndex = junkRng.RandiRange(0, possiblePositions.Count - 1);
 			Vector2I pos = new Vector2I(possiblePositions[posIndex], jarOrigin.Y);
 
 			possiblePositions.Remove(pos.X);

@@ -22,6 +22,7 @@ public partial class GameThemer : Node
 	[Export] private CommonGameSettings commonGameSettings;
 	[Export] private ThemeList themeList;
 	[Export] private MusicList musicList;
+	public MusicList MusicList { get { return musicList; } }
 
 	public void UpdateAllVisualsAndSfx()
 	{

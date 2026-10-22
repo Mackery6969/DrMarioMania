@@ -204,6 +204,13 @@ public partial class JarUIManager : Node
 			winIconContainer.SetWinAmount(wins);
 	}
 
+	// training jars don't play rounds against each other, so the round win stars mean nothing there
+	public void HideWinIcons()
+	{
+		if (winIconContainer != null)
+			winIconContainer.Visible = false;
+	}
+
 	public void SetHUDVisibility(bool b)
 	{
 		if (hudGroup != null)
@@ -258,8 +265,11 @@ public partial class JarUIManager : Node
 	{
 		PlayerMultiInputSettings inputSettings = jarMan.PlayerMultiInputSettings;
 
+		// training bots don't use any keys
+		if (jarMan.Bot != null)
+			holdKeyLabel.Text = "";
 		// controller
-		if (inputSettings.MultiplayerIsUsingController)
+		else if (inputSettings.MultiplayerIsUsingController)
 			holdKeyLabel.Text = "";
 		// full/exclusive keyboard
 		else if (inputSettings.MultiplayerIsControlMethodExclusive)

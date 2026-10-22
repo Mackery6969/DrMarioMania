@@ -86,12 +86,22 @@ public partial class PillManager : Node
 
 	// Other
 	private Vector2I startGridPos;
+	public Vector2I StartGridPos { get { return startGridPos; } }
 	private bool wasHoldUsed = false;
 	private bool debugMode = false;
 	private bool canSoftDrop = true;
 
+	// Read by training bots so they can plan around the next and held pills
+	public Pill NextPill { get { return nextPill; } }
+	public Pill HoldPill { get { return holdPill; } }
+	public bool IsHoldFilled { get { return holdPill.Visible; } }
+	public bool CanHold { get { return PlayerGameSettings.IsHoldEnabled && !wasHoldUsed; } }
+	// Training bots always have hard drop, since it's one of their controls
+	private bool IsHardDropEnabled { get { return CommonGameSettings.IsHardDropEnabled || jarMan.Bot != null; } }
+
 	// No. of pills used (including ones used from the hold slot and power-ups)
 	private int pillsUsed = 0;
+	public int PillsUsed { get { return pillsUsed; } }
 	// No. of pills used - ONLY counting ones thrown from the "next" slot
 	private int nextPillsUsed = 0;
 	private bool canUseDebugMode = false;
@@ -202,7 +212,7 @@ public partial class PillManager : Node
             nextShape = possibleShapes[nextPillsUsed % possibleShapes.Count];
 
         // Randomise next pill colours with given shape
-        nextPill.SetRandomPillColours(jarMan.PossiblePillColours, PlayerGameSettings.OnlySingleColourPills, PillType.Regular, nextShape, jarMan.LocalRng);
+        nextPill.SetRandomPillColours(jarMan.PossiblePillColours, PlayerGameSettings.OnlySingleColourPills, PillType.Regular, nextShape, jarMan.PillRng);
 	}
 
 	private void ResetAllTimersAndResets()
@@ -721,6 +731,16 @@ public partial class PillManager : Node
 	// Updates controllable pill movement
 	private void TickControl(double dt)
 	{
+		// training bots decide which buttons to press this frame, then the pill reacts to them like any other player's input
+		if (jarMan.Bot != null)
+		{
+			jarMan.Bot.UpdateControls(dt);
+
+			// the bot can end its game early (pill limit)
+			if (jarMan.IsPlayerOut)
+				return;
+		}
+
 		if (IsActionJustPressed("Hold") && PlayerGameSettings.IsHoldEnabled)
 		{
 			if (!wasHoldUsed)
@@ -837,9 +857,9 @@ public partial class PillManager : Node
 		// gravity and dropping
 		
 		// place pill into tilemap once locking finishes, hard-dropped, or (started soft-droping or soft-dropping with InstantSoftDropLock) while grounded 
-		if (((lockTimer <= 0 /* || IsActionJustPressed("SoftDrop") */ || (PlayerGameSettings.InstantSoftDropLock && IsActionPressed("SoftDrop"))) && IsGrounded()) || (IsActionJustPressed("HardDrop") && CommonGameSettings.IsHardDropEnabled))
+		if (((lockTimer <= 0 /* || IsActionJustPressed("SoftDrop") */ || (PlayerGameSettings.InstantSoftDropLock && IsActionPressed("SoftDrop"))) && IsGrounded()) || (IsActionJustPressed("HardDrop") && IsHardDropEnabled))
 		{
-			if (IsActionJustPressed("HardDrop") && CommonGameSettings.IsHardDropEnabled)
+			if (IsActionJustPressed("HardDrop") && IsHardDropEnabled)
 				HardDrop();
 
 			AddPillToTilemap(activePill);
