@@ -140,7 +140,7 @@ public partial class GameManager : Node
         // Make either single-player or multi-player jar group(s) variant depending on player count
         PackedScene jarGroupPrefab = commonGameSettings.PlayerCount == 1 ? jarGroupSinglePrefab : jarGroupMultiPrefab;
 
-        jarsLeftToFill = jars.Count;
+        jarsLeftToFill = commonGameSettings.PlayerCount;
 
         // value used to offset each jar's x pois
         int jarOffsetX = 0;
