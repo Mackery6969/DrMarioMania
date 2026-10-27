@@ -120,7 +120,7 @@ public partial class OverrideColourContainer : Control
 
 	public void ClearOverrideColours()
 	{
-		commonGameSettings.GetOverrideCustomLevelColours(currentColourOrder).Clear();
+		commonGameSettings.GetOverrideCustomLevelColours(currentColourOrder)?.Clear();
 		UpdateVisuals();
 	}
 
