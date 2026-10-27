@@ -76,10 +76,7 @@ public partial class EditorPauseManager : PauseManager
     // updates the screen given's slider and button states based on their corrisponding game setting values
 	public void RefreshUpdateableSettingScreenValues(int screen)
 	{
-        if (screens[screen] is UpdateableSettingScreen)
-        {
-            UpdateableSettingScreen gsScreen = screens[screen] as UpdateableSettingScreen;
+        if (screens[screen] is UpdateableSettingScreen gsScreen)
             gsScreen.RefreshUpdateableSettingScreenValues();
-        }
 	}
 }

@@ -30,17 +30,17 @@ public partial class EditorUndoRedoManager : Node
 
     private void CreateTiles(Dictionary<Vector2I, JarTileData> tiles)
     {
-        foreach (Vector2I pos in tiles.Keys)
+        foreach (var (pos, tile) in tiles)
         {
-            jarMan.JarTiles.SetCell(pos, tiles[pos].sourceID, tiles[pos].atlas);
+            jarMan.JarTiles.SetCell(pos, tile.sourceID, tile.atlas);
         }
     }
 
     private void UpdateSelection(Dictionary<Vector2I, bool> selectedTiles)
     {
-        foreach (Vector2I pos in selectedTiles.Keys)
+        foreach (var (pos, isSelected) in selectedTiles)
         {
-            if (selectedTiles[pos])
+            if (isSelected)
                 editorMan.AddSelectedTile(pos, false);
             else
                 editorMan.RemoveSelectedTile(pos, false);
