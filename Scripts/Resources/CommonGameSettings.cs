@@ -281,8 +281,8 @@ public partial class CommonGameSettings : Resource
             acceptButton.Device = -1;
             cancelButton.Device = -1;
 
-            acceptButton.ButtonIndex = true ? JoyButton.B : JoyButton.A;
-            cancelButton.ButtonIndex = true ? JoyButton.A : JoyButton.B;
+            acceptButton.ButtonIndex = value ? JoyButton.B : JoyButton.A;
+            cancelButton.ButtonIndex = value ? JoyButton.A : JoyButton.B;
 
             // add newly defined button input events
             InputMap.ActionAddEvent("ui_accept", acceptButton);
@@ -556,7 +556,7 @@ public partial class CommonGameSettings : Resource
 
         MultiplayerRequiredWinCount = (int)config.GetValue("Multiplayer Settings", "MultiplayerRequiredWinCount");
         
-        if (config.HasSectionKey("Multiplayer Settings", "MultiplayerRequiredWinCount"))
+        if (config.HasSectionKey("Multiplayer Settings", "MultiplayerUseJunkPills"))
             MultiplayerUseJunkPills = (bool)config.GetValue("Multiplayer Settings", "MultiplayerUseJunkPills");
 
         
