@@ -109,6 +109,9 @@ public partial class UserCustomLevelPanelContainer : ScrollContainer
         // reset v scroll position
         ScrollVertical = 0;
 
+        // keep page in range (e.g. after deleting the only level on the last page)
+        currentPage = Math.Clamp(currentPage, 0, PageCount - 1);
+
         // delete old panels
         foreach (Node node in GetChild(0).GetChildren())
         {
