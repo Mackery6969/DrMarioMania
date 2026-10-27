@@ -393,7 +393,10 @@ public partial class JarManager : Node
 			}
 
 			string[] jarSizeData = basicSettingChunks[4].Split(subItemDivider);
-			PlayerGameSettings.JarWidth = int.Parse(jarSizeData[0]);
+			int jarWidth = int.Parse(jarSizeData[0]);
+			if (jarWidth > GameConstants.jarWidthMax || jarWidth < GameConstants.jarWidthMin)
+				throw new FormatException("Jar width out of range: " + jarWidth);
+			PlayerGameSettings.JarWidth = jarWidth;
 			//PlayerGameSettings.JarSize.Y = int.Parse(jarSizeData[1]);
 			UpdateJarSize();
 
@@ -1062,7 +1065,7 @@ public partial class JarManager : Node
 
 					// skip if virus is already here
 					if (virusesRemaining.ContainsKey(potentialPos))
-						return;
+						continue;
 
 					posValid = ValidVirusPosition(potentialPos, virusColour);
 					if (posValid)
